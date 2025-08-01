@@ -2,7 +2,7 @@ terraform {
   required_providers {
     mittwald = {
       source  = "mittwald/mittwald"
-      version = "~> 1.2.0"
+      version = "~> 1.3.0"
     }
     random = {
       source = "hashicorp/random"
@@ -71,6 +71,17 @@ resource "mittwald_redis_database" "directus" {
   }
 }
 
+resource "random_password" "directus_email_outbox" {
+  length  = 16
+  special = true
+}
+
+resource "mittwald_email_outbox" "directus" {
+  project_id = var.project_id
+  description = "Directus Email Outbox"
+  password = random_password.directus_email_outbox.result
+}
+
 resource "mittwald_container_stack" "directus" {
   project_id    = var.project_id
   default_stack = true
@@ -107,6 +118,14 @@ resource "mittwald_container_stack" "directus" {
         CACHE_STORE      = "redis"
         CACHE_AUTO_PURGE = "true"
         REDIS            = "redis://${mittwald_redis_database.directus.hostname}:6379"
+
+        EMAIL_TRANSPORT   = "smtp"
+        EMAIL_SMTP_HOST   = "mail.agenturserver.de"
+        EMAIL_SMTP_SECURE = "1"
+        EMAIL_SMTP_PORT   = "587"
+        EMAIL_SMTP_USER   = mittwald_email_outbox.directus.name
+        EMAIL_SMTP_PASSWORD = random_password.directus_email_outbox.result
+        EMAIL_FROM         = var.email_from
       }
 
       volumes = [

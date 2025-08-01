@@ -31,3 +31,8 @@ variable "redis_max_memory_mb" {
   type        = number
   default     = 128
 }
+
+variable "email_from" {
+  description = "Email address used as the sender for Directus emails."
+  type        = string
+}
