@@ -5,4 +5,5 @@ output "container_id" {
 
 output "container_url" {
   description = "The URL of the Directus container."
-  value       = local.url
+  value       = "http://${local.container_name}:${local.container_port}"
+}
