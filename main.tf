@@ -2,18 +2,18 @@ terraform {
   required_providers {
     mittwald = {
       source  = "mittwald/mittwald"
-      version = "~> 1.3.0"
+      version = "~> 1.3"
     }
     random = {
-      source = "hashicorp/random"
+      source  = "hashicorp/random"
       version = "3.7.2"
     }
   }
 }
 
 locals {
-  container_name      = "directus"
-  container_port      = 8055
+  container_name = "directus"
+  container_port = 8055
 
   url = "http://${local.container_name}:${local.container_port}"
 }
@@ -23,15 +23,15 @@ data "mittwald_container_image" "directus" {
 }
 
 resource "random_password" "directus_database" {
-  length  = 24
+  length = 24
 
-  lower = true
-  upper = true
+  lower   = true
+  upper   = true
   numeric = true
   special = true
 
-  min_lower = 1
-  min_upper = 1
+  min_lower   = 1
+  min_upper   = 1
   min_numeric = 1
   min_special = 1
 
@@ -39,7 +39,7 @@ resource "random_password" "directus_database" {
 }
 
 resource "random_string" "directus_secret" {
-  length  = 32
+  length = 32
 }
 
 resource "mittwald_mysql_database" "directus" {
@@ -53,9 +53,9 @@ resource "mittwald_mysql_database" "directus" {
   }
 
   user = {
-    password            = random_password.directus_database.result
-    access_level        = "full"
-    external_access     = false
+    password        = random_password.directus_database.result
+    access_level    = "full"
+    external_access = false
   }
 }
 
@@ -65,8 +65,8 @@ resource "mittwald_redis_database" "directus" {
   description = "Directus Redis Cache"
 
   configuration = {
-    persistent = false
-    max_memory_mb = var.redis_max_memory_mb
+    persistent        = false
+    max_memory_mb     = var.redis_max_memory_mb
     max_memory_policy = "allkeys-lru"
   }
 }
@@ -77,9 +77,9 @@ resource "random_password" "directus_email_outbox" {
 }
 
 resource "mittwald_email_outbox" "directus" {
-  project_id = var.project_id
+  project_id  = var.project_id
   description = "Directus Email Outbox"
-  password = random_password.directus_email_outbox.result
+  password    = random_password.directus_email_outbox.result
 }
 
 resource "mittwald_container_stack" "directus" {
@@ -105,27 +105,27 @@ resource "mittwald_container_stack" "directus" {
         ADMIN_EMAIL    = var.admin_email
         ADMIN_PASSWORD = var.admin_password
 
-        SECRET         = random_string.directus_secret.result
+        SECRET = random_string.directus_secret.result
 
-        DB_CLIENT      = "mysql"
-        DB_HOST        = mittwald_mysql_database.directus.hostname
-        DB_PORT        = "3306"
-        DB_DATABASE    = mittwald_mysql_database.directus.name
-        DB_USER        = mittwald_mysql_database.directus.user.name
-        DB_PASSWORD    = random_password.directus_database.result
+        DB_CLIENT   = "mysql"
+        DB_HOST     = mittwald_mysql_database.directus.hostname
+        DB_PORT     = "3306"
+        DB_DATABASE = mittwald_mysql_database.directus.name
+        DB_USER     = mittwald_mysql_database.directus.user.name
+        DB_PASSWORD = random_password.directus_database.result
 
         CACHE_ENABLED    = "true"
         CACHE_STORE      = "redis"
         CACHE_AUTO_PURGE = "true"
         REDIS            = "redis://${mittwald_redis_database.directus.hostname}:6379"
 
-        EMAIL_TRANSPORT   = "smtp"
-        EMAIL_SMTP_HOST   = "mail.agenturserver.de"
-        EMAIL_SMTP_SECURE = "1"
-        EMAIL_SMTP_PORT   = "587"
-        EMAIL_SMTP_USER   = mittwald_email_outbox.directus.name
+        EMAIL_TRANSPORT     = "smtp"
+        EMAIL_SMTP_HOST     = "mail.agenturserver.de"
+        EMAIL_SMTP_SECURE   = "1"
+        EMAIL_SMTP_PORT     = "587"
+        EMAIL_SMTP_USER     = mittwald_email_outbox.directus.name
         EMAIL_SMTP_PASSWORD = random_password.directus_email_outbox.result
-        EMAIL_FROM         = var.email_from
+        EMAIL_FROM          = var.email_from
       }
 
       volumes = [
@@ -146,8 +146,8 @@ resource "mittwald_container_stack" "directus" {
   }
 
   volumes = {
-    ("${local.container_name}-uploads") = {},
+    ("${local.container_name}-uploads")    = {},
     ("${local.container_name}-extensions") = {},
-    ("${local.container_name}-templates") = {}
+    ("${local.container_name}-templates")  = {}
   }
 }

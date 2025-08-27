@@ -1,6 +1,6 @@
 variable "directus_version" {
-  type = string
-  default = "11"
+  type        = string
+  default     = "11"
   description = "Directus version to install; this needs to be a valid tag from https://hub.docker.com/r/directus/directus/tags"
 }
 
