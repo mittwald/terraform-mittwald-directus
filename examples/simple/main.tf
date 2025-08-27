@@ -10,8 +10,8 @@ module "directus" {
 }
 
 resource "random_password" "admin_password" {
-  length           = 16
-  special          = true
+  length  = 16
+  special = true
 }
 
 resource "mittwald_virtualhost" "directus" {
