@@ -31,6 +31,7 @@ This project uses Terraform to deploy [Directus](https://directus.io) on mittwal
      redis_max_memory_mb = 128
      admin_email         = "admin@example.com"
      admin_password      = "your_password"
+     email_from          = "admin@directus.example"
    }
    ```
 
